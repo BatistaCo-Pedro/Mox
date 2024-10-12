@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mox", "Mox\Mox.csproj", "{EC81BCB5-F254-4177-9B57-AAF6C8FB7126}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mox.Abstractions", "Mox.Abstractions\Mox.Abstractions.csproj", "{71C53937-3C21-4AB3-AA94-D3BA6CBD5856}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC81BCB5-F254-4177-9B57-AAF6C8FB7126}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC81BCB5-F254-4177-9B57-AAF6C8FB7126}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC81BCB5-F254-4177-9B57-AAF6C8FB7126}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC81BCB5-F254-4177-9B57-AAF6C8FB7126}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71C53937-3C21-4AB3-AA94-D3BA6CBD5856}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71C53937-3C21-4AB3-AA94-D3BA6CBD5856}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71C53937-3C21-4AB3-AA94-D3BA6CBD5856}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71C53937-3C21-4AB3-AA94-D3BA6CBD5856}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
