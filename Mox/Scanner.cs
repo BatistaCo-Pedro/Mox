@@ -1,14 +1,35 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Frozen;
+using System.Collections.Immutable;
 using static Mox.TokenType;
 
 namespace Mox;
 
 public class Scanner
 {
+    private static readonly FrozenDictionary<string, TokenType> Keywords = new Dictionary<string, TokenType>
+    {
+        { "and", AND },
+        { "class", CLASS },
+        { "else", ELSE },
+        { "false", FALSE },
+        { "for", FOR },
+        { "fun", FUN },
+        { "if", IF },
+        { "null", NULL },
+        { "or", OR },
+        { "print", PRINT },
+        { "return", RETURN },
+        { "base", BASE },
+        { "this", THIS },
+        { "true", TRUE },
+        { "var", VAR },
+        { "while", WHILE }
+    }.ToFrozenDictionary();
+    
     private readonly string _source;
     private readonly List<Token> _tokens = [];
-    private int _start = 0;
-    private int _current = 0;
+    private int _start;
+    private int _current;
     private int _line = 1;
 
     public Scanner(string source)
@@ -18,11 +39,11 @@ public class Scanner
     
     public ImmutableList<Token> ScanTokens() {
         while (!IsAtEnd()) {
-            // We are at the beginning of the next lexeme.
+            // The beginning of the next lexeme.
             _start = _current;
             ScanToken();
         }
-
+        
         _tokens.Add(new Token(EOF, string.Empty, null!, _line));
         return _tokens.ToImmutableList();
     }
@@ -66,11 +87,9 @@ public class Scanner
             
             case '/':
                 if (Match('/')) {
-                    // A comment goes until the end of the line.
-                    while (Peek() != '\n' && !IsAtEnd())
-                    {
-                        Advance();
-                    }
+                   GetSlashComment();
+                } else if (Match('*')) {
+                    GetSlashStarComment();
                 } else {
                     AddToken(SLASH);
                 }
@@ -79,24 +98,81 @@ public class Scanner
             
             case '"': GetString(); break;
             
-            default: 
+            default:
+                if (IsDigit(c))
+                {
+                    GetNumber();
+                }
+                else if (IsAlpha(c))
+                {
+                    Identifier();
+                }
+                
                 Mox.Error(_line, "Unexpected character.");
                 break;
         }
     }
-    
+
     private void AddToken(TokenType type, object literal = null!) {
         var text = _source.Substring(_start, _current);
         _tokens.Add(new Token(type, text, literal, _line));
     }
-    
-    private void GetString() 
+
+    private void GetSlashComment()
     {
-        while (Peek() != '"' && !IsAtEnd()) {
-            if (Peek() == '\n') _line++;
+        // A comment goes until the end of the line.
+        while (Peek() != '\n' && !IsAtEnd())
+        {
+            Advance();
+        }
+    }
+    
+    private void GetSlashStarComment()
+    {
+        var nextChar = Peek();
+        while (!(nextChar == '*' && PeekNext() == '\\') && !IsAtEnd())
+        {
+            if (nextChar == '\n')
+            {
+                _line++;
+            }
+            
+            Advance();
+        }
+    }
+    
+    private void GetNumber()
+    {
+        while (IsDigit(Peek()))
+        {
+            Advance();
+        }
+
+        // Look for a fractional part.
+        if (Peek() == '.' && IsDigit(PeekNext())) {
+            // Consume the "."
+            Advance();
+
+            while (IsDigit(Peek()))
             {
                 Advance();
             }
+        }
+
+        AddToken(NUMBER,
+            float.Parse(_source.Substring(_start, _current)));
+    }
+    
+    private void GetString() 
+    {
+        var nextChar = Peek();
+        while (nextChar != '"' && !IsAtEnd()) {
+            if (nextChar == '\n')
+            {
+                _line++;
+            }
+            
+            Advance();
         }
 
         if (IsAtEnd()) {
@@ -111,6 +187,30 @@ public class Scanner
         var value = _source.Substring(_start + 1, _current - 1);
         AddToken(STRING, value);
     }
+    
+    private static bool IsDigit(char c) => c is >= '0' and <= '9';
+    private static bool IsAlpha(char c) =>  c is >= 'a' and <= 'z' or >= 'A' and <= 'Z' or '_';
+    private static bool IsAlphaNumeric(char c) => IsAlpha(c) || IsDigit(c);
+    
+    private void Identifier()
+    {
+        while (IsAlphaNumeric(Peek()))
+        {
+            Advance();
+        }
+        
+        var text = _source.Substring(_start, _current);
+        var gotValue = Keywords.TryGetValue(text, out var type);
+        
+        // If the identifier is not a keyword, it must be an identifier.
+        if (!gotValue)
+        {
+            type = IDENTIFIER;
+        }
+        
+        AddToken(type);
+    }
+    
     
     private bool Match(char expected) {
         if (IsAtEnd())
@@ -127,6 +227,8 @@ public class Scanner
     }
     
     private char Peek() => IsAtEnd() ? '\0' : _source[_current];
+    
+    private char PeekNext() => _current + 1 >= _source.Length ? '\0' : _source[_current + 1];
     
     private char Advance() => _source[_current++];
     
