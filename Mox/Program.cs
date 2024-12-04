@@ -46,10 +46,10 @@ public static class Mox
         }
     }
 
-    public static void Error(int line, string message)
+    public static void Error(int line, int pos, string message)
     {
         _hasError = true;
-        Report(line, "", message);
+        Report(line, pos, message);
     }
 
     private static void Run(string source)
@@ -63,8 +63,8 @@ public static class Mox
         }
     }
 
-    private static void Report(int line, string where, string message)
+    private static void Report(int line, int pos, string message)
     {
-        Console.WriteLine("[line " + line + "] Error" + where + ": " + message);
+        Console.WriteLine($"[at {line}:{pos}] Error: {message}");
     }
 }

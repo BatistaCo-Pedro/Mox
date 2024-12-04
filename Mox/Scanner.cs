@@ -107,14 +107,16 @@ public class Scanner
                 {
                     Identifier();
                 }
-                
-                Mox.Error(_line, "Unexpected character.");
+                else
+                {
+                    Mox.Error(_line, _current, "Unexpected character.");
+                }
                 break;
         }
     }
 
     private void AddToken(TokenType type, object literal = null!) {
-        var text = _source.Substring(_start, _current);
+        var text = _source.Substring(_start, _current - _start);
         _tokens.Add(new Token(type, text, literal, _line));
     }
 
@@ -165,18 +167,12 @@ public class Scanner
     
     private void GetString() 
     {
-        var nextChar = Peek();
-        while (nextChar != '"' && !IsAtEnd()) {
-            if (nextChar == '\n')
-            {
-                _line++;
-            }
-            
+        while (Peek() != '"' && !IsAtEnd()) {
             Advance();
         }
 
         if (IsAtEnd()) {
-            Mox.Error(_line, "Unterminated string.");
+            Mox.Error(_line, _current, "Unterminated string.");
             return;
         }
 
@@ -184,7 +180,7 @@ public class Scanner
         Advance();
 
         // Trim the surrounding quotes.
-        var value = _source.Substring(_start + 1, _current - 1);
+        var value = _source.Substring(_start + 1, _current - _start - 1);
         AddToken(STRING, value);
     }
     
@@ -199,7 +195,7 @@ public class Scanner
             Advance();
         }
         
-        var text = _source.Substring(_start, _current);
+        var text = _source.Substring(_start, _current - _start);
         var gotValue = Keywords.TryGetValue(text, out var type);
         
         // If the identifier is not a keyword, it must be an identifier.
