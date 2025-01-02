@@ -1,3 +1,7 @@
 ﻿fun lol() {
     println("lol")
 }
+
+fun test() {
+    println("test")
+}

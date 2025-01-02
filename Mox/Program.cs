@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq.Expressions;
+using System.Text;
 
 namespace Mox;
 
@@ -6,6 +7,9 @@ public static class Program
 {
     public static void Main(string[] args)
     {
+        var f = Expression.Multiply(Expression.Negate(Expression.Constant(123)), Expression.Constant(45));
+        Console.Write(f.ToString());
+        
         switch (args.Length)
         {
             case > 1:

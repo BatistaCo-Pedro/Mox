@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Collections.Immutable;
+using System.Linq.Expressions;
 using static Mox.TokenType;
 
 namespace Mox;
@@ -160,7 +161,7 @@ public class Scanner
                 Advance();
             }
         }
-
+        
         AddToken(NUMBER,
             float.Parse(_source.Substring(_start, _current)));
     }
